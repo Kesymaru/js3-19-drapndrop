@@ -1,0 +1,12 @@
+
+.collection {
+    min-height: 350px;
+}
+
+.collection li {
+    cursor: move;
+}
+
+h5 {
+    text-transform: capitalize;
+}
