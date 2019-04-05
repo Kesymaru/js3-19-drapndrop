@@ -2,18 +2,23 @@
  * Todo singleton
  */
 const TodoData = (function () {
-    // private data
-    const DATA = [];
+    // private
+    const PREFIX = 'TODO_DATA';
+    let DATA = [];
 
     let instance = null;
 
     return class TodoData {
         static Subscriptions = Object.freeze({
             'TODO_ADDED': Symbol('TODO_ADDED'),
+            'TODO_DONE': Symbol('TODO_DONE'),
         });
 
         constructor () {
-            if(instance) instance = this;
+            if(!instance){
+                this.restore();
+                instance = this;
+            }
             return instance;
         }
 
@@ -22,7 +27,7 @@ const TodoData = (function () {
          * @returns {Array}
          */
         get todo () {
-            return DATA.filter(i => !i.done);
+            return DATA.filter(item => !item.done);
         }
 
         /**
@@ -30,7 +35,7 @@ const TodoData = (function () {
          * @returns {Array}
          */
         get done () {
-            return DATA.filter(i => i.done);
+            return DATA.filter(item => item.done);
         }
 
         /**
@@ -38,7 +43,7 @@ const TodoData = (function () {
          * @param {number} id
          * @returns {null|array}
          */
-        get(id) {
+        get (id) {
             return DATA.find(item => item.id == id);
         }
 
@@ -52,6 +57,10 @@ const TodoData = (function () {
 
             // add the todo
             DATA.push(todo);
+
+            // save the data into the localstorage
+            this.save();
+
             Mediator.Publish(TodoData.Subscriptions.TODO_ADDED, todo);
         }
 
@@ -62,6 +71,38 @@ const TodoData = (function () {
         remove (todo) {
             let idx = DATA.findIndex(i => i === todo);
             if(idx > -1) DATA.splice(idx, 1);
+        }
+
+        toggleItem (todo) {
+            todo.done = !todo.done;
+
+            this.save();
+
+            if(todo.done) Mediator.Publish(TodoData.Subscriptions.TODO_DONE, todo);
+        }
+
+        save () {
+            console.log('save')
+            try {
+                let data = JSON.stringify(DATA.map(i => i.toObject()));
+                localStorage.setItem(PREFIX, data);
+            } catch (error) {
+                console.error(`Can not save the todo data into the localstorage.`);
+            }
+        }
+
+        restore () {
+            try {
+                let data = localStorage.getItem(PREFIX);
+                if(data) {
+                    data = JSON.parse(data);
+                    if(Array.isArray(data)) {
+                        DATA = data.map(item => new TodoItem(item.text, item.done));
+                    }
+                }
+            } catch (err) {
+                console.error(`Can not get the todo data into the localstorage.`);
+            }
         }
     }
 })();

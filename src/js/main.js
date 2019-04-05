@@ -1,5 +1,5 @@
 (function () {
-    const DATA = new TodoData;
+    const DATA = new TodoData();
 
     let todo = null;
     let addElement = null;
@@ -9,7 +9,7 @@
      * init the todos
      */
     function main () {
-        let todo = new Todo('section');
+        todo = new Todo('section');
 
         let addElement = document.querySelector('#addTodo');
         addElement.addEventListener('click', addTodo);
@@ -28,7 +28,7 @@
             onSave: onSave.bind({form}),
         });
         dialog.promise
-            .then(data => DATA.add(new TodoItem(data.text, data.done)))
+            .then(data => DATA.add(new TodoItem(data.text, data.doneUl)))
             .catch(err => console.log('dialog closed'));
 
         // method called on save dialog

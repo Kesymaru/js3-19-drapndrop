@@ -3,8 +3,8 @@
  */
 const Todo = (function () {
     return class Todo {
-        todo = null;
-        done = null;
+        todoUl = null;
+        doneUl = null;
         data = new TodoData();
 
         constructor (container) {
@@ -21,8 +21,8 @@ const Todo = (function () {
          * Render the draggable elements
          */
         render () {
-            this._ul('todo');
-            this._ul('done');
+            this.todoUl = this._ul('todo');
+            this.doneUl = this._ul('done');
         }
 
         /**
@@ -57,10 +57,9 @@ const Todo = (function () {
             col.addEventListener('drop', this.drop.bind(this));
             col.addEventListener('dragover', this.dragover.bind(this));
 
-            // save the list DOM reference
-            this[data] = ul;
-
             this.container.appendChild(col);
+
+            return ul;
         }
 
         /**
@@ -71,6 +70,8 @@ const Todo = (function () {
          * @private
          */
         _addTodo (todo, ul) {
+            console.log('_addTodo', todo, ul);
+
             todo.element.addEventListener('dragstart', this.dragstart);
             ul.appendChild(todo.element);
 
@@ -87,8 +88,8 @@ const Todo = (function () {
             let todo = this.data.get(id);
             if(!todo) return false;
 
-            // update the done state
-            todo.done = !todo.done;
+            // toggle the todo done status
+            this.data.toggleItem(todo);
 
             // remove the element on the current list
             todo.element.parentNode.removeChild(todo.element);
@@ -122,7 +123,9 @@ const Todo = (function () {
             if(!(todo instanceof TodoItem))
                 throw new Error(`Invalid todo item: ${todo}`);
 
-            let ul = todo.done ? this.done : this.todo;
+            console.log('add todo', todo);
+
+            let ul = todo.done ? this.doneUl : this.todoUl;
             this._addTodo(todo, ul);
         }
     }

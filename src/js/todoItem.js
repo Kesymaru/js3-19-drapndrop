@@ -2,8 +2,8 @@
  * Todo Item factory
  */
 const TodoItem = (function () {
+    // private
     let ID = 0;
-    _element = null;
     return class TodoItem {
         _done = false;
         _element = null;
@@ -79,5 +79,13 @@ const TodoItem = (function () {
             // update the icon if exist
             if (this._icon) this._iconText();
         }
+
+        toObject () {
+            return {
+                text: this.text,
+                done: this.done,
+            }
+        }
     }
+
 })();
